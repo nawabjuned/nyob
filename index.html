@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>A letter for you</title>
+<style>
+  :root {
+    --bg: #f1eadf;
+    --bg2: #e9dfd0;
+    --paper: #fffdf8;
+    --ink: #2b2622;
+    --muted: #7b6f62;
+    --line: #e0d5c4;
+    --accent: #8c2f39;
+    --accent-2: #a63c48;
+    --on-accent: #fff7f2;
+    --env: #e6d9c3;
+    --env-2: #efe4d0;
+    --flap: #dccdb3;
+    --shadow: 0 18px 40px rgba(70, 45, 20, .16);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1613;
+      --bg2: #14110f;
+      --paper: #26201b;
+      --ink: #efe6d9;
+      --muted: #a69a8a;
+      --line: #3a322a;
+      --accent: #c4545f;
+      --accent-2: #d46671;
+      --on-accent: #1a1210;
+      --env: #3a3128;
+      --env-2: #443a2f;
+      --flap: #4d4236;
+      --shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: radial-gradient(120% 90% at 50% 0%, var(--bg) 0%, var(--bg2) 100%);
+    color: var(--ink);
+    font-family: var(--serif);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  main { width: 100%; max-width: 640px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- locked screen ---------- */
+  .lock { text-align: center; animation: rise .8s ease both; }
+  .lock.leaving { animation: fadeout .5s ease forwards; }
+  h1 {
+    font-weight: 400;
+    font-size: clamp(1.9rem, 6vw, 2.5rem);
+    letter-spacing: .01em;
+    margin: 0 0 8px;
+  }
+  .sub { color: var(--muted); font-style: italic; margin: 0 auto 26px; max-width: 30em; line-height: 1.5; }
+
+  .env {
+    position: relative;
+    width: min(290px, 74vw);
+    aspect-ratio: 3 / 2;
+    margin: 0 auto 30px;
+    perspective: 900px;
+    filter: drop-shadow(0 16px 22px rgba(60, 40, 20, .22));
+  }
+  .env-back { position: absolute; inset: 0; background: var(--env); border-radius: 7px; }
+  .env-pocket {
+    position: absolute; inset: 0; border-radius: 7px;
+    background: var(--env-2);
+    clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+  }
+  .env-flap {
+    position: absolute; left: 0; right: 0; top: 0; height: 58%;
+    background: var(--flap);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform .9s cubic-bezier(.5, .05, .2, 1);
+    border-radius: 7px 7px 0 0;
+  }
+  .seal {
+    position: absolute; left: 50%; top: 58%;
+    width: 50px; height: 50px; margin: -25px 0 0 -25px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 62%);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3), inset 0 0 0 4px rgba(255, 255, 255, .07);
+    display: grid; place-items: center;
+    color: var(--on-accent);
+    font-size: 19px;
+    transition: transform .5s ease, opacity .5s ease;
+  }
+  .seal::after {
+    content: ""; position: absolute; inset: 7px; border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .28);
+  }
+  .opened .env-flap { transform: rotateX(180deg); }
+  .opened .seal { transform: scale(1.5); opacity: 0; }
+
+  form { max-width: 360px; margin: 0 auto; text-align: left; }
+  label { display: block; font-family: var(--sans); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px 2px; }
+  .field { display: flex; gap: 8px; }
+  input[type=password], input[type=text] {
+    flex: 1; min-width: 0;
+    font: inherit; font-size: 1.05rem;           /* 16px+ stops iPhone zoom */
+    padding: 13px 14px;
+    background: var(--paper); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 10px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+  .peek {
+    font-family: var(--sans); font-size: .85rem;
+    padding: 0 14px; border-radius: 10px;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--line); cursor: pointer;
+  }
+  .peek:hover { color: var(--ink); }
+  .open-btn {
+    width: 100%; margin-top: 14px;
+    font-family: var(--sans); font-size: 1rem; font-weight: 600; letter-spacing: .02em;
+    padding: 14px 18px; border: 0; border-radius: 10px; cursor: pointer;
+    background: var(--accent); color: var(--on-accent);
+    transition: transform .12s, background .15s, opacity .15s;
+  }
+  .open-btn:hover { background: var(--accent-2); }
+  .open-btn:active { transform: translateY(1px); }
+  .open-btn[disabled] { opacity: .65; cursor: progress; }
+  .msg { min-height: 1.5em; margin: 12px 2px 0; font-family: var(--sans); font-size: .9rem; color: var(--accent); }
+  .shake { animation: shake .4s; }
+
+  /* ---------- the letter ---------- */
+  .letter { animation: rise .9s ease both; }
+  .paper {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: clamp(28px, 7vw, 56px) clamp(22px, 7vw, 60px);
+    position: relative;
+  }
+  .paper::before {                       /* soft ruled margin line */
+    content: ""; position: absolute; top: 0; bottom: 0; left: clamp(10px, 3vw, 26px);
+    border-left: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  .paper p {
+    margin: 0 0 1.15em;
+    font-size: clamp(1.02rem, 2.6vw, 1.18rem);
+    line-height: 1.75;
+    white-space: pre-line;
+    opacity: 0; transform: translateY(8px);
+    animation: line .7s ease forwards;
+  }
+  .paper p:last-child { margin-bottom: 0; }
+  .actions { text-align: center; margin-top: 22px; }
+  .ghost {
+    font-family: var(--sans); font-size: .85rem; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 16px; cursor: pointer;
+  }
+  .ghost:hover { color: var(--ink); border-color: var(--muted); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeout { to { opacity: 0; transform: translateY(-8px); } }
+  @keyframes line { to { opacity: 1; transform: none; } }
+  @keyframes shake { 0%, 100% { transform: none; } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }
+  }
+  @media print {
+    body { background: #fff; display: block; padding: 0; }
+    .lock, .actions { display: none !important; }
+    .paper { box-shadow: none; border: 0; color: #000; background: #fff; }
+    .paper::before { display: none; }
+    .paper p { opacity: 1; transform: none; animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="lock" id="lock">
+    <div class="env" id="env" aria-hidden="true">
+      <div class="env-back"></div>
+      <div class="env-pocket"></div>
+      <div class="env-flap"></div>
+      <div class="seal">&#10022;</div>
+    </div>
+    <h1>A letter for you</h1>
+    <p class="sub" id="clue"></p>
+    <form id="form" autocomplete="off">
+      <label for="key">Passphrase</label>
+      <div class="field">
+        <input id="key" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">
+        <button class="peek" id="peek" type="button" aria-pressed="false">Show</button>
+      </div>
+      <button class="open-btn" id="go" type="submit">Open the letter</button>
+      <p class="msg" id="msg" role="alert" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <article class="letter" id="letter" hidden>
+    <div class="paper" id="paper"></div>
+    <div class="actions"><button class="ghost" id="print" type="button">Print or save as PDF</button></div>
+  </article>
+</main>
+
+<script>
+/* The letter below is encrypted (AES-256-GCM, key from PBKDF2-SHA256).
+   Without the passphrase it is unreadable. Nothing is sent anywhere. */
+const PAYLOAD = {"v":1,"n":600000,"s":"hDPrbkl+xzjt1vHSJei/kg==","i":"AVNWUd/ttgVbSAVP","c":"h7t3Z5yKMfPrB1HFHGrQjcl9rI4AuhqoUrO65VBiNGpw7wFpM06+OjcV0QQx","clue":"the thing i believe"};
+
+const te = new TextEncoder(), td = new TextDecoder();
+const $ = id => document.getElementById(id);
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const norm = s => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+async function decryptLetter(pass, p) {
+  const base = await crypto.subtle.importKey("raw", te.encode(norm(pass)), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(p.s), iterations: p.n, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(p.i) }, key, b64(p.c));
+  return td.decode(plain);
+}
+
+function showLetter(text) {
+  const paper = $("paper");
+  paper.textContent = "";
+  text.trim().split(/\n{2,}/).forEach((block, i) => {
+    const p = document.createElement("p");
+    p.textContent = block.trim();
+    p.style.animationDelay = (0.25 + i * 0.35) + "s";
+    paper.appendChild(p);
+  });
+  $("lock").hidden = true;
+  $("letter").hidden = false;
+  window.scrollTo(0, 0);
+}
+
+(function init() {
+  if (!PAYLOAD) { $("msg").textContent = "This page has no letter inside yet."; $("go").disabled = true; return; }
+  $("clue").textContent = PAYLOAD.clue || "";
+  if (!window.crypto || !crypto.subtle) {
+    $("msg").textContent = "Your browser can't unlock this here. Please open the page in Chrome, Safari or Firefox.";
+    $("go").disabled = true;
+  }
+  $("peek").addEventListener("click", () => {
+    const shown = $("key").type === "text";
+    $("key").type = shown ? "password" : "text";
+    $("peek").textContent = shown ? "Show" : "Hide";
+    $("peek").setAttribute("aria-pressed", String(!shown));
+  });
+  $("print").addEventListener("click", () => window.print());
+  $("form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const pass = $("key").value;
+    if (!norm(pass)) { $("msg").textContent = "Type the passphrase first."; return; }
+    $("go").disabled = true; $("go").textContent = "Opening…"; $("msg").textContent = "";
+    try {
+      const text = await decryptLetter(pass, PAYLOAD);
+      $("env").classList.add("opened");
+      setTimeout(() => $("lock").classList.add("leaving"), 800);
+      setTimeout(() => showLetter(text), 1250);
+    } catch (err) {
+      $("msg").textContent = "That passphrase doesn't open it. Check it with the person who gave you this.";
+      const f = $("form"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
+      $("go").disabled = false; $("go").textContent = "Open the letter";
+      $("key").focus(); $("key").select();
+    }
+  });
+})();
+</script>
+</body>
+</html>
